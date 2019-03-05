@@ -1,1 +1,10 @@
 #!/usr/bin/env python
+# scalc is a script to do various slurm calculations.
+
+import sys,os,subprocess
+
+print "What do you want to calculate?"
+print "1) Projected FairShare Based on New RawShare"
+print "2) Additional RawShare Need for FairShare Score"
+print "3) Projected Time to Reach FairShare Score Assuming No New Jobs"
+print "4) Projected Usage and Fairshare Based on Job"
