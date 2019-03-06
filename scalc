@@ -3,8 +3,25 @@
 
 import sys,os,subprocess
 
-print "What do you want to calculate?"
-print "1) Projected FairShare Based on New RawShare"
-print "2) Additional RawShare Need for FairShare Score"
-print "3) Projected Time to Reach FairShare Score Assuming No New Jobs"
-print "4) Projected Usage and Fairshare Based on Job"
+def main():
+	print "What do you want to calculate?"
+	print "1) Projected FairShare Based on New RawShare"
+	print "2) Additional RawShare Need for FairShare Score"
+	print "3) Projected Time to Reach FairShare Score Assuming No New Jobs"
+	print "4) Projected Usage and Fairshare Based on Job"
+
+	option = input("Option: ")
+
+	if option == 1:
+		FairshareRawshare()
+	elif option == 2:
+		print "Calculating Additional RawShare Need for FairShare Score"
+	elif option == 3:
+		print "Calculating Projected Time to Reach FairShare Score Assuming No New Jobs"
+	elif option == 4:
+		print "Calculating Projected Usage and Fairshare Based on Job"
+
+def FairshareRawshare():
+	print "Calculating Projected FairShare Based on New RawShare"
+
+main()
