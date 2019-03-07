@@ -4,6 +4,9 @@
 import sys,os,subprocess,shlex
 from math import log, ceil
 
+if sys.version_info[0] != 2:
+    raise Exception("Must be using Python 2")
+
 # Subroutines
 ###############################################################
 # Main handles the selection of which calculation to run.
