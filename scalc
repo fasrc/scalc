@@ -103,8 +103,6 @@ def Decay():
 			thalf=28.0
 			t = -thalf*log(-float(NormShares)/float(NormUsage)*log(newfairshare,2.0),2.0)
 
-			t = t
-
 			print account, "will need", t, "days to reach a fairshare of", newfairshare, "if they submit no further jobs"
 
 			return
