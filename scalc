@@ -79,7 +79,7 @@ def RawshareFairshare():
 
 # Decay calculates how long it would take to reach a specific fairshare if the user stopped running immediately.
 def Decay():
-	print "We will now calculate how long it will take for the specified account to reach the specified fairshare if no new jobs are submitted"
+	print "We will now calculate how long it will take for the specified account to reach the specified fairshare if no new jobs are submitted."
 	account = raw_input("First we need to know what account you want to calculate for: ")
 	newfairshare = raw_input("Now we need to know the target Fairshare: ")
 
@@ -92,16 +92,16 @@ def Decay():
 	else:
 		for line in proc.stdout:
 			(RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
-			print account, "has a current Usage of", RawUsage, "and Fairshare of", Fairshare
+			print account, "has a current Normalized Usage of", NormUsage, "a Normalized Allocation of", NormShares, "and Fairshare of", Fairshare
 			
 			newfairshare = min(float(newfairshare),0.99999)
-			# c is the TRES/sec of the cluster
-			c = 160000.0
-			t = 1.0/c*(-float(RawUsage)/(float(NormShares)*log(float(newfairshare),2.0))-float(RawUsage)/float(NormUsage))
+			# thalf is the current fairshare halflife
+			thalf=28.0*24.0*60.0*60.0
+			t = -thalf*log(-float(NormShares)/float(NormUsage)*log(newfairshare,2.0),2.0)
 
 			t = t/(24.0*60.0*60.0)
 
-			print "For a fairshare of", newfairshare, account, "will need", t, "days"
+			print account, "will need", t, "days to reach a fairshare of", newfairshare, "if they submit no further jobs"
 
 			return
 
