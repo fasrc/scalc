@@ -118,6 +118,7 @@ def JobFairshare():
 	partition = raw_input("Next we need the partition you want to submit to: ")
 	cores = input("How many cores will you use per job: ")
 	mem = input("How much memory in GB will you use per job: ")
+        gpu = input("How many total GPUs will you user per job: ")
 	timelimit = raw_input("How long will the job run for (DD-HH:MM:SS): ")
 	numjobs = input("How many jobs (or array elements) will you run of this type: ")
 
@@ -140,7 +141,7 @@ def JobFairshare():
 	except:
 		return
 	else:
-		# Cycle through each node
+		# Cycle through each line
 		for line in proc.stdout:
 			# Turn partition information into a hash
 			part = dict(s.split("=", 1) for s in shlex.split(line) if '=' in s)
@@ -148,19 +149,35 @@ def JobFairshare():
 			# Extract the TRES weights
 			tresweights = part['TRESBillingWeights']
 
-			(cpuweight, memweight) = tresweights.strip().split(',')
 
-			(temp, cpuweight) = cpuweight.strip().split('=')
-			(temp, memweight) = memweight.strip().split('=')
+			if tresweights.count(',') == 1:
+
+                                (cpuweight, memweight) = tresweights.strip().split(',')
+
+                                (temp, cpuweight) = cpuweight.strip().split('=')
+                                (temp, memweight) = memweight.strip().split('=')
+				gpuweight = 0
+
+                        elif tresweights.count(',') == 2:
+
+				(cpuweight, memweight, gpuweight) = tresweights.strip().split(',')
+
+				(temp, cpuweight) = cpuweight.strip().split('=')
+				(temp, memweight) = memweight.strip().split('=')
+                        	(temp, gpuweight) = gpuweight.strip().split('=')
+
+
 			memweight = memweight.strip('G')
+
+	print "This partition has a TRES charge per second of CPU:", cpuweight, "| Mem (per GB):", memweight, "| GPU (per GPU):", gpuweight
 
 	# Convert time to seconds
 	(days, tempt) = timelimit.split('-')
 	(hours, mins, secs) = tempt.split(':')
 	t = 86400.0*float(days)+3600.0*float(hours)+60.0*float(mins)+float(secs)
 
-	trestot = t*(float(cpuweight)*float(cores)+float(memweight)*float(mem))*float(numjobs)
-	print "This set of jobs have a total TRES usage of:", trestot
+	trestot = t*(float(cpuweight)*float(cores)+float(memweight)*float(mem)+float(gpuweight)*float(gpu))*float(numjobs)
+	print "This set of jobs has a total TRES usage of:", trestot
 
 	odysseyusage = float(RawUsage)/float(NormUsage)
 	newnormusage = (float(RawUsage)+trestot)/odysseyusage
