@@ -16,13 +16,15 @@ def main():
 
   option = input("Option: ")
 
-  if option == 1:
+  print(option)
+
+  if option == '1':
     FairshareRawshare()
-  elif option == 2:
+  elif option == '2':
     RawshareFairshare()
-  elif option == 3:
+  elif option == '3':
     Decay()
-  elif option == 4:
+  elif option == '4':
     JobFairshare()
 
 ###############################################################
