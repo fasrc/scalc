@@ -1,21 +1,18 @@
-#!/usr/bin/env /usr/bin/python
+#!/usr/bin/env /usr/bin/python3
 # scalc is a script to do various slurm calculations.
 
 import sys,os,subprocess,shlex
 from math import log, ceil
 
-if sys.version_info[0] != 2:
-    raise Exception("Must be using Python 2")
-
 # Subroutines
 ###############################################################
 # Main handles the selection of which calculation to run.
 def main():
-	print "What do you want to calculate?"
-	print "1) Projected FairShare Based on New RawShare"
-	print "2) Additional RawShare Need for FairShare Score"
-	print "3) Projected Time to Reach FairShare Score Assuming No New Jobs"
-	print "4) Projected Usage and Fairshare Based on Job"
+	print("What do you want to calculate?")
+	print("1) Projected FairShare Based on New RawShare")
+	print("2) Additional RawShare Need for FairShare Score")
+	print("3) Projected Time to Reach FairShare Score Assuming No New Jobs")
+	print("4) Projected Usage and Fairshare Based on Job")
 
 	option = input("Option: ")
 
@@ -32,7 +29,7 @@ def main():
 # FairshareRawshare calculates the projected fairshare based on a given rawshare
 # and current usage of an account.
 def FairshareRawshare():
-	print "We will now calculate the projected fairshare score based on the current usage of the Account and RawShare you specify."
+	print("We will now calculate the projected fairshare score based on the current usage of the Account and RawShare you specify.")
 	account = raw_input("First we need to know what account you want to calculate for: ")
 	newrawshare = input("Now we need to know the new RawShare: ")
 
@@ -45,14 +42,14 @@ def FairshareRawshare():
 	else:
 		for line in proc.stdout:
 			(RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
-			print account, "has a current RawShare of", RawShares, "and Fairshare of", Fairshare
+			print(account, "has a current RawShare of", RawShares, "and Fairshare of", Fairshare)
 
 			odysseyshare = float(RawShares)/float(NormShares)
 			g = float(newrawshare)/odysseyshare
 
 			f = pow(2.0,(-float(NormUsage)/g))
 
-			print "With a new RawShare of", newrawshare, account, "would have a Fairshare of", f
+			print("With a new RawShare of", newrawshare, account, "would have a Fairshare of", f)
 
 			return
 
@@ -60,7 +57,7 @@ def FairshareRawshare():
 # RawshareFairshare calculates the Rawshare required to reach a given fairshare score
 # if the current usage of the account remains constant
 def RawshareFairshare():
-	print "We will now calculate the Rawshares required to reach a specific Fairshare based on the current usage of an Account you specify."
+	print("We will now calculate the Rawshares required to reach a specific Fairshare based on the current usage of an Account you specify.")
 	account = raw_input("First we need to know what account you want to calculate for: ")
 	newfairshare = raw_input("Now we need to know the target Fairshare: ")
 
@@ -73,20 +70,20 @@ def RawshareFairshare():
 	else:
 		for line in proc.stdout:
 			(RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
-			print account, "has a current RawShare of", RawShares, "and Fairshare of", Fairshare
-			
+			print(account, "has a current RawShare of", RawShares, "and Fairshare of", Fairshare)
+
 			newfairshare = min(float(newfairshare),0.99999)
 			odysseyshare = float(RawShares)/float(NormShares)
 			r = -float(NormUsage)*odysseyshare/log(float(newfairshare),2.0)
 
-			print "For a fairshare of", newfairshare, account, "will need a RawShare of", int(ceil(r))
+			print("For a fairshare of", newfairshare, account, "will need a RawShare of", int(ceil(r)))
 
 			return
 
 ###########################################################
 # Decay calculates how long it would take to reach a specific fairshare if the user stopped running immediately.
 def Decay():
-	print "We will now calculate how long it will take for the specified account to reach the specified fairshare if no new jobs are submitted."
+	print("We will now calculate how long it will take for the specified account to reach the specified fairshare if no new jobs are submitted.")
 	account = raw_input("First we need to know what account you want to calculate for: ")
 	newfairshare = raw_input("Now we need to know the target Fairshare: ")
 
@@ -99,21 +96,21 @@ def Decay():
 	else:
 		for line in proc.stdout:
 			(RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
-			print account, "has a current Normalized Usage of", NormUsage, "a Normalized Allocation of", NormShares, "and Fairshare of", Fairshare
-			
+			print(account, "has a current Normalized Usage of", NormUsage, "a Normalized Allocation of", NormShares, "and Fairshare of", Fairshare)
+
 			newfairshare = min(float(newfairshare),0.99999)
 			# thalf is the current fairshare halflife
 			thalf=28.0
 			t = -thalf*log(-float(NormShares)/float(NormUsage)*log(newfairshare,2.0),2.0)
 
-			print account, "will need", t, "days to reach a fairshare of", newfairshare, "if they submit no further jobs"
+			print(account, "will need", t, "days to reach a fairshare of", newfairshare, "if they submit no further jobs")
 
 			return
 
 #########################################################
 # JobFairshare calculates the projected TRES usage for a job based on a given partition and the impact on the specified account's usage and fairshare.
 def JobFairshare():
-	print "We will now calculate how much TRES your jobs will cost as well as how it will impact the specified account's usage and fairshare."
+	print("We will now calculate how much TRES your jobs will cost as well as how it will impact the specified account's usage and fairshare.")
 	account = raw_input("First we need to know what account you want to calculate for: ")
 	partition = raw_input("Next we need the partition you want to submit to: ")
 	cores = input("How many cores will you use per job: ")
@@ -131,7 +128,7 @@ def JobFairshare():
 	else:
 		for line in proc.stdout:
 			(RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
-			print account, "has a current Raw Usage of", RawUsage, "a Normalized Usage of", NormUsage, "a Normalized Allocation of", NormShares, "and Fairshare of", Fairshare
+			print(account, "has a current Raw Usage of", RawUsage, "a Normalized Usage of", NormUsage, "a Normalized Allocation of", NormShares, "and Fairshare of", Fairshare)
 			break
 
 	try:
@@ -169,7 +166,7 @@ def JobFairshare():
 
 			memweight = memweight.strip('G')
 
-	print "This partition has a TRES charge per second of CPU:", cpuweight, "| Mem (per GB):", memweight, "| GPU (per GPU):", gpuweight
+	print("This partition has a TRES charge per second of CPU:", cpuweight, "| Mem (per GB):", memweight, "| GPU (per GPU):", gpuweight)
 
 	# Convert time to seconds
 	(days, tempt) = timelimit.split('-')
@@ -177,13 +174,13 @@ def JobFairshare():
 	t = 86400.0*float(days)+3600.0*float(hours)+60.0*float(mins)+float(secs)
 
 	trestot = t*(float(cpuweight)*float(cores)+float(memweight)*float(mem)+float(gpuweight)*float(gpu))*float(numjobs)
-	print "This set of jobs has a total TRES usage of:", trestot
+	print("This set of jobs has a total TRES usage of:", trestot)
 
 	odysseyusage = float(RawUsage)/float(NormUsage)
 	newnormusage = (float(RawUsage)+trestot)/odysseyusage
 	newfairshare = pow(2.0,-newnormusage/float(NormShares))
 
-	print "For", account, "this will give a new Normalized Usage of", newnormusage, "and a Fairshare of", newfairshare
+	print("For", account, "this will give a new Normalized Usage of", newnormusage, "and a Fairshare of", newfairshare)
 
 #########################################################
 # Actually start program
