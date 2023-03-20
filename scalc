@@ -32,7 +32,7 @@ def main():
 # and current usage of an account.
 def FairshareRawshare():
   print("We will now calculate the projected fairshare score based on the current usage of the Account and RawShare you specify.")
-  account = raw_input("First we need to know what account you want to calculate for: ")
+  account = input("First we need to know what account you want to calculate for: ")
   newrawshare = input("Now we need to know the new RawShare: ")
 
   try:
@@ -60,8 +60,8 @@ def FairshareRawshare():
 # if the current usage of the account remains constant
 def RawshareFairshare():
   print("We will now calculate the Rawshares required to reach a specific Fairshare based on the current usage of an Account you specify.")
-  account = raw_input("First we need to know what account you want to calculate for: ")
-  newfairshare = raw_input("Now we need to know the target Fairshare: ")
+  account = input("First we need to know what account you want to calculate for: ")
+  newfairshare = input("Now we need to know the target Fairshare: ")
 
   try:
           # sshare command we will use to get the data
@@ -86,8 +86,8 @@ def RawshareFairshare():
 # Decay calculates how long it would take to reach a specific fairshare if the user stopped running immediately.
 def Decay():
   print("We will now calculate how long it will take for the specified account to reach the specified fairshare if no new jobs are submitted.")
-  account = raw_input("First we need to know what account you want to calculate for: ")
-  newfairshare = raw_input("Now we need to know the target Fairshare: ")
+  account = input("First we need to know what account you want to calculate for: ")
+  newfairshare = input("Now we need to know the target Fairshare: ")
 
   try:
           # sshare command we will use to get the data
@@ -113,12 +113,12 @@ def Decay():
 # JobFairshare calculates the projected TRES usage for a job based on a given partition and the impact on the specified account's usage and fairshare.
 def JobFairshare():
   print("We will now calculate how much TRES your jobs will cost as well as how it will impact the specified account's usage and fairshare.")
-  account = raw_input("First we need to know what account you want to calculate for: ")
-  partition = raw_input("Next we need the partition you want to submit to: ")
+  account = input("First we need to know what account you want to calculate for: ")
+  partition = input("Next we need the partition you want to submit to: ")
   cores = input("How many cores will you use per job: ")
   mem = input("How much memory in GB will you use per job: ")
   gpu = input("How many total GPUs will you user per job: ")
-  timelimit = raw_input("How long will the job run for (DD-HH:MM:SS): ")
+  timelimit = input("How long will the job run for (DD-HH:MM:SS): ")
   numjobs = input("How many jobs (or array elements) will you run of this type: ")
 
   try:
