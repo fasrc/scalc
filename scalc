@@ -1,4 +1,4 @@
-#!/usr/bin/env /usr/bin/python3
+#!/usr/bin/python3
 # scalc is a script to do various slurm calculations.
 
 import sys,os,subprocess,shlex
@@ -8,179 +8,177 @@ from math import log, ceil
 ###############################################################
 # Main handles the selection of which calculation to run.
 def main():
-	print("What do you want to calculate?")
-	print("1) Projected FairShare Based on New RawShare")
-	print("2) Additional RawShare Need for FairShare Score")
-	print("3) Projected Time to Reach FairShare Score Assuming No New Jobs")
-	print("4) Projected Usage and Fairshare Based on Job")
+  print("What do you want to calculate?")
+  print("1) Projected FairShare Based on New RawShare")
+  print("2) Additional RawShare Need for FairShare Score")
+  print("3) Projected Time to Reach FairShare Score Assuming No New Jobs")
+  print("4) Projected Usage and Fairshare Based on Job")
 
-	option = input("Option: ")
+  option = input("Option: ")
 
-	if option == 1:
-		FairshareRawshare()
-	elif option == 2:
-		RawshareFairshare()
-	elif option == 3:
-		Decay()
-	elif option == 4:
-		JobFairshare()
+  if option == 1:
+    FairshareRawshare()
+  elif option == 2:
+    RawshareFairshare()
+  elif option == 3:
+    Decay()
+  elif option == 4:
+    JobFairshare()
 
 ###############################################################
 # FairshareRawshare calculates the projected fairshare based on a given rawshare
 # and current usage of an account.
 def FairshareRawshare():
-	print("We will now calculate the projected fairshare score based on the current usage of the Account and RawShare you specify.")
-	account = raw_input("First we need to know what account you want to calculate for: ")
-	newrawshare = input("Now we need to know the new RawShare: ")
+  print("We will now calculate the projected fairshare score based on the current usage of the Account and RawShare you specify.")
+  account = raw_input("First we need to know what account you want to calculate for: ")
+  newrawshare = input("Now we need to know the new RawShare: ")
 
-	try:
-	        # sshare command we will use to get the data
-		args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage,Fairshare']
-		proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-	except:
-		return
-	else:
-		for line in proc.stdout:
-			(RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
-			print(account, "has a current RawShare of", RawShares, "and Fairshare of", Fairshare)
+  try:
+          # sshare command we will use to get the data
+    args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage,Fairshare']
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+  except:
+    return
+  else:
+    for line in proc.stdout:
+      (RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
+      print(account, "has a current RawShare of", RawShares, "and Fairshare of", Fairshare)
 
-			odysseyshare = float(RawShares)/float(NormShares)
-			g = float(newrawshare)/odysseyshare
+      odysseyshare = float(RawShares)/float(NormShares)
+      g = float(newrawshare)/odysseyshare
 
-			f = pow(2.0,(-float(NormUsage)/g))
+      f = pow(2.0,(-float(NormUsage)/g))
 
-			print("With a new RawShare of", newrawshare, account, "would have a Fairshare of", f)
+      print("With a new RawShare of", newrawshare, account, "would have a Fairshare of", f)
 
-			return
+      return
 
 #############################################################
 # RawshareFairshare calculates the Rawshare required to reach a given fairshare score
 # if the current usage of the account remains constant
 def RawshareFairshare():
-	print("We will now calculate the Rawshares required to reach a specific Fairshare based on the current usage of an Account you specify.")
-	account = raw_input("First we need to know what account you want to calculate for: ")
-	newfairshare = raw_input("Now we need to know the target Fairshare: ")
+  print("We will now calculate the Rawshares required to reach a specific Fairshare based on the current usage of an Account you specify.")
+  account = raw_input("First we need to know what account you want to calculate for: ")
+  newfairshare = raw_input("Now we need to know the target Fairshare: ")
 
-	try:
-	        # sshare command we will use to get the data
-		args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage,Fairshare']
-		proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-	except:
-		return
-	else:
-		for line in proc.stdout:
-			(RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
-			print(account, "has a current RawShare of", RawShares, "and Fairshare of", Fairshare)
+  try:
+          # sshare command we will use to get the data
+    args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage,Fairshare']
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+  except:
+    return
+  else:
+    for line in proc.stdout:
+      (RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
+      print(account, "has a current RawShare of", RawShares, "and Fairshare of", Fairshare)
 
-			newfairshare = min(float(newfairshare),0.99999)
-			odysseyshare = float(RawShares)/float(NormShares)
-			r = -float(NormUsage)*odysseyshare/log(float(newfairshare),2.0)
+      newfairshare = min(float(newfairshare),0.99999)
+      odysseyshare = float(RawShares)/float(NormShares)
+      r = -float(NormUsage)*odysseyshare/log(float(newfairshare),2.0)
 
-			print("For a fairshare of", newfairshare, account, "will need a RawShare of", int(ceil(r)))
+      print("For a fairshare of", newfairshare, account, "will need a RawShare of", int(ceil(r)))
 
-			return
+      return
 
 ###########################################################
 # Decay calculates how long it would take to reach a specific fairshare if the user stopped running immediately.
 def Decay():
-	print("We will now calculate how long it will take for the specified account to reach the specified fairshare if no new jobs are submitted.")
-	account = raw_input("First we need to know what account you want to calculate for: ")
-	newfairshare = raw_input("Now we need to know the target Fairshare: ")
+  print("We will now calculate how long it will take for the specified account to reach the specified fairshare if no new jobs are submitted.")
+  account = raw_input("First we need to know what account you want to calculate for: ")
+  newfairshare = raw_input("Now we need to know the target Fairshare: ")
 
-	try:
-	        # sshare command we will use to get the data
-		args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage,Fairshare']
-		proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-	except:
-		return
-	else:
-		for line in proc.stdout:
-			(RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
-			print(account, "has a current Normalized Usage of", NormUsage, "a Normalized Allocation of", NormShares, "and Fairshare of", Fairshare)
+  try:
+          # sshare command we will use to get the data
+    args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage,Fairshare']
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+  except:
+    return
+  else:
+    for line in proc.stdout:
+      (RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
+      print(account, "has a current Normalized Usage of", NormUsage, "a Normalized Allocation of", NormShares, "and Fairshare of", Fairshare)
 
-			newfairshare = min(float(newfairshare),0.99999)
-			# thalf is the current fairshare halflife
-			thalf=28.0
-			t = -thalf*log(-float(NormShares)/float(NormUsage)*log(newfairshare,2.0),2.0)
+      newfairshare = min(float(newfairshare),0.99999)
+      # thalf is the current fairshare halflife
+      thalf=28.0
+      t = -thalf*log(-float(NormShares)/float(NormUsage)*log(newfairshare,2.0),2.0)
 
-			print(account, "will need", t, "days to reach a fairshare of", newfairshare, "if they submit no further jobs")
+      print(account, "will need", t, "days to reach a fairshare of", newfairshare, "if they submit no further jobs")
 
-			return
+      return
 
 #########################################################
 # JobFairshare calculates the projected TRES usage for a job based on a given partition and the impact on the specified account's usage and fairshare.
 def JobFairshare():
-	print("We will now calculate how much TRES your jobs will cost as well as how it will impact the specified account's usage and fairshare.")
-	account = raw_input("First we need to know what account you want to calculate for: ")
-	partition = raw_input("Next we need the partition you want to submit to: ")
-	cores = input("How many cores will you use per job: ")
-	mem = input("How much memory in GB will you use per job: ")
+  print("We will now calculate how much TRES your jobs will cost as well as how it will impact the specified account's usage and fairshare.")
+  account = raw_input("First we need to know what account you want to calculate for: ")
+  partition = raw_input("Next we need the partition you want to submit to: ")
+  cores = input("How many cores will you use per job: ")
+  mem = input("How much memory in GB will you use per job: ")
         gpu = input("How many total GPUs will you user per job: ")
-	timelimit = raw_input("How long will the job run for (DD-HH:MM:SS): ")
-	numjobs = input("How many jobs (or array elements) will you run of this type: ")
+  timelimit = raw_input("How long will the job run for (DD-HH:MM:SS): ")
+  numjobs = input("How many jobs (or array elements) will you run of this type: ")
 
-	try:
-	        # sshare command we will use to get the data
-		args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage,Fairshare']
-		proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-	except:
-		return
-	else:
-		for line in proc.stdout:
-			(RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
-			print(account, "has a current Raw Usage of", RawUsage, "a Normalized Usage of", NormUsage, "a Normalized Allocation of", NormShares, "and Fairshare of", Fairshare)
-			break
+  try:
+          # sshare command we will use to get the data
+    args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage,Fairshare']
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+  except:
+    return
+  else:
+    for line in proc.stdout:
+      (RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
+      print(account, "has a current Raw Usage of", RawUsage, "a Normalized Usage of", NormUsage, "a Normalized Allocation of", NormShares, "and Fairshare of", Fairshare)
+      break
 
-	try:
-		# scontrol command to get partition data
-		args = ['scontrol', '-o', 'show', 'partition', partition]
-		proc = subprocess.Popen(args, stdout=subprocess.PIPE)
-	except:
-		return
-	else:
-		# Cycle through each line
-		for line in proc.stdout:
-			# Turn partition information into a hash
-			part = dict(s.split("=", 1) for s in shlex.split(line) if '=' in s)
+  try:
+    # scontrol command to get partition data
+    args = ['scontrol', '-o', 'show', 'partition', partition]
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+  except:
+    return
+  else:
+    # Cycle through each line
+    for line in proc.stdout:
+      # Turn partition information into a hash
+      part = dict(s.split("=", 1) for s in shlex.split(line) if '=' in s)
 
-			# Extract the TRES weights
-			tresweights = part['TRESBillingWeights']
+      # Extract the TRES weights
+      tresweights = part['TRESBillingWeights']
 
+      if tresweights.count(',') == 1:
 
-			if tresweights.count(',') == 1:
+        (cpuweight, memweight) = tresweights.strip().split(',')
 
-                                (cpuweight, memweight) = tresweights.strip().split(',')
+        (temp, cpuweight) = cpuweight.strip().split('=')
+        (temp, memweight) = memweight.strip().split('=')
+        gpuweight = 0
 
-                                (temp, cpuweight) = cpuweight.strip().split('=')
-                                (temp, memweight) = memweight.strip().split('=')
-				gpuweight = 0
+      elif tresweights.count(',') == 2:
 
-                        elif tresweights.count(',') == 2:
+        (cpuweight, memweight, gpuweight) = tresweights.strip().split(',')
 
-				(cpuweight, memweight, gpuweight) = tresweights.strip().split(',')
+        (temp, cpuweight) = cpuweight.strip().split('=')
+        (temp, memweight) = memweight.strip().split('=')
+        (temp, gpuweight) = gpuweight.strip().split('=')
 
-				(temp, cpuweight) = cpuweight.strip().split('=')
-				(temp, memweight) = memweight.strip().split('=')
-                        	(temp, gpuweight) = gpuweight.strip().split('=')
+      memweight = memweight.strip('G')
 
+  print("This partition has a TRES charge per second of CPU:", cpuweight, "| Mem (per GB):", memweight, "| GPU (per GPU):", gpuweight)
 
-			memweight = memweight.strip('G')
+  # Convert time to seconds
+  (days, tempt) = timelimit.split('-')
+  (hours, mins, secs) = tempt.split(':')
+  t = 86400.0*float(days)+3600.0*float(hours)+60.0*float(mins)+float(secs)
 
-	print("This partition has a TRES charge per second of CPU:", cpuweight, "| Mem (per GB):", memweight, "| GPU (per GPU):", gpuweight)
+  trestot = t*(float(cpuweight)*float(cores)+float(memweight)*float(mem)+float(gpuweight)*float(gpu))*float(numjobs)
+  print("This set of jobs has a total TRES usage of:", trestot)
 
-	# Convert time to seconds
-	(days, tempt) = timelimit.split('-')
-	(hours, mins, secs) = tempt.split(':')
-	t = 86400.0*float(days)+3600.0*float(hours)+60.0*float(mins)+float(secs)
+  odysseyusage = float(RawUsage)/float(NormUsage)
+  newnormusage = (float(RawUsage)+trestot)/odysseyusage
+  newfairshare = pow(2.0,-newnormusage/float(NormShares))
 
-	trestot = t*(float(cpuweight)*float(cores)+float(memweight)*float(mem)+float(gpuweight)*float(gpu))*float(numjobs)
-	print("This set of jobs has a total TRES usage of:", trestot)
-
-	odysseyusage = float(RawUsage)/float(NormUsage)
-	newnormusage = (float(RawUsage)+trestot)/odysseyusage
-	newfairshare = pow(2.0,-newnormusage/float(NormShares))
-
-	print("For", account, "this will give a new Normalized Usage of", newnormusage, "and a Fairshare of", newfairshare)
+  print("For", account, "this will give a new Normalized Usage of", newnormusage, "and a Fairshare of", newfairshare)
 
 #########################################################
 # Actually start program
