@@ -115,7 +115,7 @@ def JobFairshare():
   partition = raw_input("Next we need the partition you want to submit to: ")
   cores = input("How many cores will you use per job: ")
   mem = input("How much memory in GB will you use per job: ")
-        gpu = input("How many total GPUs will you user per job: ")
+  gpu = input("How many total GPUs will you user per job: ")
   timelimit = raw_input("How long will the job run for (DD-HH:MM:SS): ")
   numjobs = input("How many jobs (or array elements) will you run of this type: ")
 
