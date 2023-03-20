@@ -136,7 +136,7 @@ def JobFairshare():
   try:
     # scontrol command to get partition data
     args = ['scontrol', '-o', 'show', 'partition', partition]
-    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, universal_newlines=True)
   except:
     return
   else:
