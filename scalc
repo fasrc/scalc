@@ -13,6 +13,7 @@ def main():
   print("2) Additional RawShare Need for FairShare Score")
   print("3) Projected Time to Reach FairShare Score Assuming No New Jobs")
   print("4) Projected Usage and Fairshare Based on Job")
+  print("5) Calculate New RawShare Based on Additional Hardware")
 
   option = input("Option: ")
 
@@ -26,6 +27,8 @@ def main():
     Decay()
   elif option == '4':
     JobFairshare()
+  elif option == '5':
+    AddHardware()
 
 ###############################################################
 # FairshareRawshare calculates the projected fairshare based on a given rawshare
@@ -181,6 +184,32 @@ def JobFairshare():
   newfairshare = pow(2.0,-newnormusage/float(NormShares))
 
   print("For", account, "this will give a new Normalized Usage of", newnormusage, "and a Fairshare of", newfairshare)
+
+#########################################################
+# AddHardware calculates the new RawShares for a Lab depending on the Hardware indicated.
+def JobFairshare():
+  print("We will now calculate the new RawShare for a specified account based on the additional hardware specified. Available hardware types are Intel IceLake cores and Nvidia A100 GPU's")
+  account = input("First we need to know what account you want to calculate for: ")
+  icelake = input("How many Intel IceLake cores do you want to add: ")
+  a100 = input("How many Nvidia A100 GPU's do you want to add: ")
+
+  # TRES Weights
+  icelaketres = 1.15
+  a100tres = 209.1
+
+  try:
+          # sshare command we will use to get the data
+    args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage,Fairshare']
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, universal_newlines=True)
+  except:
+    return
+  else:
+    for line in proc.stdout:
+      (RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
+
+  newrawshares = icelaketres*float(icelake)+a100tres*float(a100)
+
+  print ("Account", account, "has current RawShares of", RawShares, ". The additional hardware would add ", floor(newrawshares), " RawShares for a total of", floor(newrawshares+float(RawShares)))
 
 #########################################################
 # Actually start program
