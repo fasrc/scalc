@@ -206,6 +206,7 @@ def AddHardware():
   else:
     for line in proc.stdout:
       (RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
+      break
 
   newrawshares = icelaketres*float(icelake)+a100tres*float(a100)
 
