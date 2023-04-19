@@ -210,7 +210,8 @@ def AddHardware():
 
   newrawshares = icelaketres*float(icelake)+a100tres*float(a100)
 
-  print ("Account", account, "has current RawShares of", RawShares, "The additional hardware would add", int(newrawshares), "RawShares for a total of", int(newrawshares+float(RawShares)))
+  print ("Account", account, "has current RawShares of", RawShares)
+  print ("The additional hardware would add", int(newrawshares), "RawShares for a total of", int(newrawshares+float(RawShares)))
 
 #########################################################
 # Actually start program
