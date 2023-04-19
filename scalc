@@ -188,7 +188,7 @@ def JobFairshare():
 #########################################################
 # AddHardware calculates the new RawShares for a Lab depending on the Hardware indicated.
 def AddHardware():
-  print("We will now calculate the new RawShare for a specified account based on the additional hardware specified. Available hardware types are Intel IceLake cores and Nvidia A100 GPU's")
+  print("We will now calculate the new RawShare for a specified account based on the additional hardware specified. Available hardware types are Intel IceLake cores and Nvidia A100 GPUs")
   account = input("First we need to know what account you want to calculate for: ")
   icelake = input("How many Intel IceLake cores do you want to add: ")
   a100 = input("How many Nvidia A100 GPU's do you want to add: ")
