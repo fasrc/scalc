@@ -105,7 +105,7 @@ def Decay():
 
       newfairshare = min(float(newfairshare),0.99999)
       # thalf is the current fairshare halflife
-      thalf=28.0
+      thalf=3.0
       t = -thalf*log(-float(NormShares)/float(NormUsage)*log(newfairshare,2.0),2.0)
 
       print(account, "will need", t, "days to reach a fairshare of", newfairshare, "if they submit no further jobs")
@@ -188,13 +188,13 @@ def JobFairshare():
 #########################################################
 # AddHardware calculates the new RawShares for a Lab depending on the Hardware indicated.
 def AddHardware():
-  print("We will now calculate the new RawShare for a specified account based on the additional hardware specified. Available hardware types are Intel IceLake cores and Nvidia A100 GPUs")
+  print("We will now calculate the new RawShare for a specified account based on the additional hardware specified. Available hardware types are Intel Sapphire Rapids cores and Nvidia A100 GPUs")
   account = input("First we need to know what account you want to calculate for: ")
-  icelake = input("How many Intel IceLake cores (TRES Weight = 1.15) do you want to add: ")
+  sapphirerapids = input("How many Intel Sapphire Rapids cores (TRES Weight = 0.6) do you want to add: ")
   a100 = input("How many Nvidia A100 GPUs (TRES Weight = 209.1) do you want to add: ")
 
   # TRES Weights
-  icelaketres = 1.15
+  sapphirerapidstres = 0.6
   a100tres = 209.1
 
   try:
@@ -208,7 +208,7 @@ def AddHardware():
       (RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
       break
 
-  newrawshares = icelaketres*float(icelake)+a100tres*float(a100)
+  newrawshares = sapphirerapidstres*float(sapphirerapids)+a100tres*float(a100)
 
   print ("Account", account, "has current RawShares of", RawShares)
   print ("The additional hardware would add", int(newrawshares), "RawShares for a total of", int(newrawshares+float(RawShares)))
