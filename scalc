@@ -179,11 +179,14 @@ def JobFairshare():
   trestot = t*(float(cpuweight)*float(cores)+float(memweight)*float(mem)+float(gpuweight)*float(gpu))*float(numjobs)
   print("This set of jobs has a total TRES usage of:", trestot)
 
-  odysseyusage = max(float(RawUsage),1)/max(float(NormUsage),0.000001)
-  newnormusage = (float(RawUsage)+trestot)/(odysseyusage+trestot)
-  newfairshare = pow(2.0,-newnormusage/float(NormShares))
-
-  print("For", account, "this will give a new Normalized Usage of", newnormusage, "and a Fairshare of", newfairshare)
+  if float(NormUsage) < 0.000001:
+    print("Cannot project new Normalized Usage and Fairshare as current Normalized Usage is too low")
+    print("Normalized Usage (EffectvUsage) is 0.000000, must be at least 0.000001")
+  else:
+    odysseyusage = float(RawUsage)/float(NormUsage)
+    newnormusage = (float(RawUsage)+trestot)/(odysseyusage+trestot)
+    newfairshare = pow(2.0,-newnormusage/float(NormShares))
+    print("For", account, "this will give a new Normalized Usage of", newnormusage, "and a Fairshare of", newfairshare)
 
 #########################################################
 # AddHardware calculates the new RawShares for a Lab depending on the Hardware indicated.
