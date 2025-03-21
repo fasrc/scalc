@@ -179,8 +179,8 @@ def JobFairshare():
   trestot = t*(float(cpuweight)*float(cores)+float(memweight)*float(mem)+float(gpuweight)*float(gpu))*float(numjobs)
   print("This set of jobs has a total TRES usage of:", trestot)
 
-  odysseyusage = float(RawUsage)/float(NormUsage)
-  newnormusage = (float(RawUsage)+trestot)/odysseyusage
+  odysseyusage = max(float(RawUsage),1)/max(float(NormUsage),0.000001)
+  newnormusage = (float(RawUsage)+trestot)/(odysseyusage+trestot)
   newfairshare = pow(2.0,-newnormusage/float(NormShares))
 
   print("For", account, "this will give a new Normalized Usage of", newnormusage, "and a Fairshare of", newfairshare)
