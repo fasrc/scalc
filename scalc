@@ -37,21 +37,22 @@ def FairshareRawshare():
 
   try:
           # sshare command we will use to get the data
-    args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage,Fairshare']
+    args = ['sshare', '-hP', '-A', account, '--format=RawShares,NormShares,RawUsage,NormUsage']
     proc = subprocess.Popen(args, stdout=subprocess.PIPE, universal_newlines=True)
   except:
     return
   else:
     for line in proc.stdout:
-      (RawShares, NormShares, RawUsage, NormUsage, Fairshare) = line.strip().split('|')
-      print(account, "has a current RawShare of", RawShares, "and Fairshare of", Fairshare)
-
+      (RawShares, NormShares, RawUsage, NormUsage) = line.strip().split('|')
+      
       odysseyshare = float(RawShares)/float(NormShares)
       g = float(newrawshare)/odysseyshare
 
-      f = pow(2.0,(-float(NormUsage)/g))
+      cf = pow(2.0,(-float(NormUsage)/float(NormShares)))
+      nf = pow(2.0,(-float(NormUsage)/g))
 
-      print("With a new RawShare of", newrawshare, account, "would have a Fairshare of", f)
+      print(account, "has a current RawShare of", RawShares, "and Fairshare of", cf)
+      print("With a new RawShare of", newrawshare, account, "would have a Fairshare of", nf)
 
       return
 
